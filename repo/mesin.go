@@ -1,7 +1,7 @@
 package repo
 
 import (
-	"bitbucket.org/mirzaakhena/seed-project/model"
+	"bitbucket.org/mirzaakhena/go-seed-project/model"
 	"github.com/jinzhu/gorm"
 )
 

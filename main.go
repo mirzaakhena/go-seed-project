@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bitbucket.org/mirzaakhena/seed-project/controller"
-	"bitbucket.org/mirzaakhena/seed-project/model"
-	"bitbucket.org/mirzaakhena/seed-project/repo"
-	"bitbucket.org/mirzaakhena/seed-project/service"
+	"bitbucket.org/mirzaakhena/go-seed-project/controller"
+	"bitbucket.org/mirzaakhena/go-seed-project/model"
+	"bitbucket.org/mirzaakhena/go-seed-project/repo"
+	"bitbucket.org/mirzaakhena/go-seed-project/service"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	_ "github.com/satori/go.uuid"

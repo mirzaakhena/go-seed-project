@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"bitbucket.org/mirzaakhena/seed-project/dto"
-	"bitbucket.org/mirzaakhena/seed-project/service"
+	"bitbucket.org/mirzaakhena/go-seed-project/dto"
+	"bitbucket.org/mirzaakhena/go-seed-project/service"
 	"gopkg.in/gin-gonic/gin.v1"
 	"net/http"
 )

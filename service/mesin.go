@@ -1,9 +1,9 @@
 package service
 
 import (
-	"bitbucket.org/mirzaakhena/seed-project/dto"
-	"bitbucket.org/mirzaakhena/seed-project/model"
-	"bitbucket.org/mirzaakhena/seed-project/repo"
+	"bitbucket.org/mirzaakhena/go-seed-project/dto"
+	"bitbucket.org/mirzaakhena/go-seed-project/model"
+	"bitbucket.org/mirzaakhena/go-seed-project/repo"
 )
 
 type Barang struct {
