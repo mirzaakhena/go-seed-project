@@ -3,7 +3,7 @@
 This project has 5 section
 
 ### Model
-Model is media to store your data. It
+Model is media to store your data.
 
 ### Repo
 Repo is a bridge to convert from database table to object in your program flow vice versa.
