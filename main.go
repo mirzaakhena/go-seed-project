@@ -1,13 +1,11 @@
 package main
 
 import (
-	"bitbucket.org/mirzaakhena/go-seed-project/controller"
-	"bitbucket.org/mirzaakhena/go-seed-project/model"
-	"bitbucket.org/mirzaakhena/go-seed-project/repo"
-	"bitbucket.org/mirzaakhena/go-seed-project/service"
+	"bitbucket.org/mirzaakhena/miranc-go/controller"
+	"bitbucket.org/mirzaakhena/miranc-go/model"
+	"bitbucket.org/mirzaakhena/miranc-go/service"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	_ "github.com/satori/go.uuid"
 	"gopkg.in/gin-gonic/gin.v1"
 )
 
@@ -19,18 +17,19 @@ func main() {
 		panic("gak bisa konek ke database")
 	}
 
-	// build table according to schema
-	db.AutoMigrate(&model.Barang{})
+	// // build table according to schema
+	// // db.AutoMigrate(&model.User{})
+	db.AutoMigrate(&model.Akun{})
 
 	// wiring "bean"
-	barangRepo := repo.Barang{DB: db}
-	barangService := service.Barang{Repo: barangRepo}
-	barangController := controller.Barang{Service: barangService}
+	akunService := service.AkunService{DB: db}
+	akunController := controller.AkunCtrl{AkunService: &akunService}
 
 	// prepare endpoint api
 	router := gin.Default()
-	router.GET("/barang", barangController.GetAllBarang)
-	router.POST("/barang", barangController.AddBarang)
+
+	// endpoints
+	router.POST("/:usahaId/akun", akunController.CreateNewAkun)
 
 	// start server
 	router.Run()
