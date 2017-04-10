@@ -29,8 +29,8 @@ func (serv AkunService) CreateNewAkun(param CreateAkunParam) {
 			ID:          uuid.NewV4().String(),
 			Name:        param.Name,
 			UsahaId:     "something",
-			ChildType:   model.AkunChildType(param.ChildType),
-			Side:        model.AkunSide(param.Side),
+			ChildType:   param.ChildType,
+			Side:        param.Side,
 			Code:        strconv.Itoa(count + 1),
 			Level:       1,
 			ParentId:    "",
@@ -49,7 +49,7 @@ func (serv AkunService) CreateNewAkun(param CreateAkunParam) {
 			ID:          uuid.NewV4().String(),
 			Name:        param.Name,
 			UsahaId:     "something",
-			ChildType:   model.AkunChildType(param.ChildType),
+			ChildType:   param.ChildType,
 			Side:        parentAkun.Side,
 			Code:        param.ParentCode + "." + strconv.Itoa(nextChildIndex),
 			Level:       parentAkun.Level + 1,
@@ -60,7 +60,7 @@ func (serv AkunService) CreateNewAkun(param CreateAkunParam) {
 
 		parentAkun.CurrentCode = parentAkun.CurrentCode + 1
 		parentAkun.ChildCount = parentAkun.ChildCount + 1
-		serv.DB.Update(&parentAkun)
+		serv.DB.Save(&parentAkun)
 
 		fmt.Println("input anak parentAkun " + parentAkun.Name)
 	}

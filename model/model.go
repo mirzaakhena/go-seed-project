@@ -29,19 +29,15 @@ package model
 
 // // =======================
 
-type AkunSide string
-
 const (
-	ACTIVA  AkunSide = "ACTIVA"
-	PASSIVA AkunSide = "PASSIVA"
+	ACTIVA  string = "ACTIVA"
+	PASSIVA string = "PASSIVA"
 )
 
-type AkunChildType string
-
 const (
-	SUB_AKUN        AkunChildType = "SUB_AKUN"
-	INVENTORY       AkunChildType = "INVENTORY"
-	WORK_IN_PROCESS AkunChildType = "WORK_IN_PROCESS"
+	SUB_AKUN        string = "SUB_AKUN"
+	INVENTORY       string = "INVENTORY"
+	WORK_IN_PROCESS string = "WORK_IN_PROCESS"
 )
 
 type Akun struct {
@@ -50,8 +46,8 @@ type Akun struct {
 	Name        string
 	Code        string
 	Level       int
-	Side        AkunSide
-	ChildType   AkunChildType
+	Side        string
+	ChildType   string
 	CurrentCode int
 	ChildCount  int
 	ParentId    string
