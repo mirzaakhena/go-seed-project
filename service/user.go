@@ -2,9 +2,9 @@ package service
 
 import (
 	"bitbucket.org/mirzaakhena/miranc-go/model"
-	_ "errors"
+	"errors"
 	"github.com/jinzhu/gorm"
-	_ "github.com/satori/go.uuid"
+	"github.com/satori/go.uuid"
 	_ "strconv"
 )
 
@@ -20,18 +20,26 @@ type RegisterParam struct {
 	Alamat   string `json:"alamat"`
 }
 
+type LoginParam struct {
+	Email    string `json:"email" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
 func (serv UserService) Register(param RegisterParam) error {
 
 	var count int
-	serv.DB.Model(&model.User{}).Where("email = ?", param.Email).Count(&count)
-	log.Debugf("count => %d", count)
+
+	tx := serv.DB.Begin()
+
+	tx.Model(&model.User{}).Where("email = ?", param.Email).Count(&count)
+
 	if count > 0 {
 		s := "User dengan email " + param.Email + " sudah terdaftar"
 		log.Errorf(s)
 		return errors.New(s)
 	}
 
-	serv.DB.Create(&model.User{
+	tx.Create(&model.User{
 		ID:       uuid.NewV4().String(),
 		Nama:     param.Nama,
 		Email:    param.Email,
@@ -40,11 +48,29 @@ func (serv UserService) Register(param RegisterParam) error {
 		Alamat:   param.Alamat,
 	})
 
+	tx.Commit()
+
+	log.Infof("user %s berhasil didaftarkan", param.Nama)
+
 	return nil
 }
 
-func (serv UserService) Login(param RegisterParam) error {
-	return nil
+func (serv UserService) Login(param LoginParam) (string, error) {
+
+	var user model.User
+	serv.DB.Where("email = ? AND password = ?", param.Email, param.Password).First(&user)
+	if user.ID == "" {
+		s := "email atau password tidak cocok"
+		log.Errorf(s)
+		return "", errors.New(s)
+	}
+
+	token, err := GenerateToken(user.ID)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
 }
 
 func (serv UserService) Invite(usahaId string, param RegisterParam) error {

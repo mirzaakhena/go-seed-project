@@ -19,7 +19,7 @@ func (ctrl UserRest) Register(c *gin.Context) {
 
 	err := ctrl.UserService.Register(param)
 	if err != nil {
-		c.JSON(http.StatusCreated, map[string]string{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
 		return
 	}
 
@@ -28,9 +28,25 @@ func (ctrl UserRest) Register(c *gin.Context) {
 }
 
 func (ctrl UserRest) Login(c *gin.Context) {
+	var param service.LoginParam
+	if err := c.BindJSON(&param); err != nil {
+		c.JSON(http.StatusBadRequest, map[string]string{"message": "invalid params"})
+		return
+	}
 
+	token, err := ctrl.UserService.Login(param)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
+		return
+	}
+
+	c.Writer.Header().Add("token", token)
+
+	c.JSON(http.StatusOK, map[string]string{"message": "user berhasil login"})
 }
 
 func (ctrl UserRest) Invite(c *gin.Context) {
-
+	v, ok := c.Get("jwt")
+	jwt, _ := service.CustomJwt(v)
+	c.JSON(http.StatusOK, map[string]string{"message": jwt.UserId})
 }

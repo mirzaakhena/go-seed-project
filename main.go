@@ -39,6 +39,7 @@ func main() {
 
 	authorized.Use(rest.Authenticate)
 	{
+		authorized.GET("/", userRest.Invite)
 		authorized.POST("/:usahaId/invite", userRest.Invite)
 		authorized.POST("/:usahaId/akun", akunRest.CreateNewAkun)
 
