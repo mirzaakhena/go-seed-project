@@ -1,33 +1,38 @@
 package model
 
-// type User struct {
-// 	ID       string
-// 	Nama     string
-// 	Email    string
-// 	Password string
-// 	Phone    string
-// 	Address  string
-// }
+type User struct {
+	ID       string
+	Nama     string
+	Email    string
+	Password string
+	Telepon  string
+	Alamat   string
+}
 
-// type Usaha struct {
-// 	ID   string
-// 	Nama string
-// }
+type Usaha struct {
+	ID   string
+	Nama string
+}
 
-// type HakAkses struct {
-// 	ID      string
-// 	UsahaId string
-// 	Nama    string
-// }
+type HakAkses struct {
+	ID      string
+	UsahaId string
+	Nama    string
+}
 
-// type UserUsahaHakAkses struct {
-// 	ID         string
-// 	UserId     string
-// 	UsahaId    string
-// 	HakAksesId string
-// }
+type UserUsaha struct {
+	ID      string
+	UserId  string
+	UsahaId string
+}
 
-// // =======================
+type UserHakAkses struct {
+	ID         string
+	UserId     string
+	HakAksesId string
+}
+
+// =======================
 
 const (
 	ACTIVA  string = "ACTIVA"
