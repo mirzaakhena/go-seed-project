@@ -9,7 +9,6 @@ import (
 
 func Authenticate(c *gin.Context) {
 	token := c.Request.Header.Get("Authorization")
-	log.Debug(token)
 	s := strings.Fields(token)
 	if len(s) != 2 {
 		c.AbortWithStatus(http.StatusForbidden)
@@ -25,4 +24,5 @@ func Authenticate(c *gin.Context) {
 		return
 	}
 	c.Set("jwt", jwt)
+
 }

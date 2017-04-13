@@ -10,20 +10,22 @@ type User struct {
 }
 
 type Usaha struct {
-	ID   string
-	Nama string
-}
-
-type HakAkses struct {
-	ID      string
-	UsahaId string
-	Nama    string
+	ID          string
+	Name        string
+	Description string
 }
 
 type UserUsaha struct {
 	ID      string
 	UserId  string
 	UsahaId string
+	Usaha   Usaha
+}
+
+type HakAkses struct {
+	ID      string
+	UsahaId string
+	Name    string
 }
 
 type UserHakAkses struct {

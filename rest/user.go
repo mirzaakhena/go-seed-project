@@ -46,7 +46,7 @@ func (ctrl UserRest) Login(c *gin.Context) {
 }
 
 func (ctrl UserRest) Invite(c *gin.Context) {
-	v, ok := c.Get("jwt")
-	jwt, _ := service.CustomJwt(v)
+	v, _ := c.Get("jwt")
+	jwt, _ := v.(*service.CustomJwt)
 	c.JSON(http.StatusOK, map[string]string{"message": jwt.UserId})
 }

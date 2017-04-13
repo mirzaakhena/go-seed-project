@@ -17,9 +17,13 @@ func main() {
 		panic("gak bisa konek ke database")
 	}
 
+	db.LogMode(true)
+
 	// // build table according to schema
 	db.AutoMigrate(&model.User{})
 	db.AutoMigrate(&model.Akun{})
+	db.AutoMigrate(&model.Usaha{})
+	db.AutoMigrate(&model.UserUsaha{})
 
 	// wiring "bean"
 	userService := service.UserService{DB: db}
@@ -27,6 +31,9 @@ func main() {
 
 	akunService := service.AkunService{DB: db}
 	akunRest := rest.AkunRest{AkunService: &akunService}
+
+	usahaService := service.UsahaService{DB: db}
+	usahaRest := rest.UsahaRest{UsahaService: &usahaService}
 
 	// prepare endpoint api
 	router := gin.Default()
@@ -39,7 +46,10 @@ func main() {
 
 	authorized.Use(rest.Authenticate)
 	{
-		authorized.GET("/", userRest.Invite)
+
+		authorized.POST("/", usahaRest.CreateUsaha)
+		authorized.GET("/", usahaRest.GetAllUsahaByUser)
+
 		authorized.POST("/:usahaId/invite", userRest.Invite)
 		authorized.POST("/:usahaId/akun", akunRest.CreateNewAkun)
 
