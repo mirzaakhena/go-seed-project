@@ -16,8 +16,8 @@ type RegisterParam struct {
 	Nama     string `json:"nama" binding:"required"`
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
-	Telepon  string `json:"telepon"`
-	Alamat   string `json:"alamat"`
+	Phone    string `json:"phone"`
+	Address  string `json:"address"`
 }
 
 type LoginParam struct {
@@ -44,8 +44,8 @@ func (serv UserService) Register(param RegisterParam) error {
 		Nama:     param.Nama,
 		Email:    param.Email,
 		Password: param.Password,
-		Telepon:  param.Telepon,
-		Alamat:   param.Alamat,
+		Phone:    param.Phone,
+		Address:  param.Address,
 	})
 
 	tx.Commit()

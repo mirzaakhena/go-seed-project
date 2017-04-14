@@ -13,7 +13,7 @@ type UsahaService struct {
 }
 
 type CreateUsahaParam struct {
-	Name        string `json:"name"`
+	Name        string `json:"name" binding:"required"`
 	Description string `json:"description"`
 }
 
@@ -41,7 +41,7 @@ func (serv UsahaService) GetAllUsahaByUser(userId string) []model.Usaha {
 
 	listOfUsaha := make([]model.Usaha, 0)
 	for _, obj := range listOfUserUsaha {
-		listOfUsaha = append(listOfUsaha, obj.Usaha)
+		listOfUsaha = append(listOfUsaha, *obj.Usaha)
 	}
 
 	return listOfUsaha

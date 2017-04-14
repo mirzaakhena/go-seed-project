@@ -13,10 +13,10 @@ type AkunService struct {
 }
 
 type CreateAkunParam struct {
-	Name       string
-	ParentCode string
-	Side       string
-	ChildType  string
+	Name       string `json:"name" binding:"required"`
+	ParentCode string `json:"parent_code"`
+	Side       string `json:"side"`
+	ChildType  string `json:"child_type" binding:"required"`
 }
 
 func (serv AkunService) CreateNewAkun(usahaId string, param CreateAkunParam) error {
@@ -84,6 +84,7 @@ func (serv AkunService) CreateNewAkun(usahaId string, param CreateAkunParam) err
 			if err != nil {
 				tx.Rollback()
 				log.Errorf("error ketika buat akun anak. Rollback! ", err.Error())
+				return err
 			}
 		}
 
@@ -95,6 +96,7 @@ func (serv AkunService) CreateNewAkun(usahaId string, param CreateAkunParam) err
 			if err != nil {
 				tx.Rollback()
 				log.Errorf("error ketika update akun parent setelah buat akun anak. ", err.Error())
+				return err
 			}
 		}
 
@@ -105,4 +107,10 @@ func (serv AkunService) CreateNewAkun(usahaId string, param CreateAkunParam) err
 
 	return nil
 
+}
+
+func (serv AkunService) GetAllAkun(usahaId string) []model.Akun {
+	var listOfAkun []model.Akun
+	serv.DB.Where("usaha_id = ? AND deleted = 0", usahaId).Find(&listOfAkun)
+	return listOfAkun
 }

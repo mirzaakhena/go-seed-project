@@ -31,3 +31,10 @@ func (ctrl AkunRest) CreateNewAkun(c *gin.Context) {
 	c.JSON(http.StatusCreated, map[string]string{"message": "akun berhasil dibuat"})
 
 }
+
+func (ctrl AkunRest) GetAllAkun(c *gin.Context) {
+
+	usahaId := c.Param("usahaId")
+
+	c.JSON(http.StatusOK, ctrl.AkunService.GetAllAkun(usahaId))
+}

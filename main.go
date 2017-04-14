@@ -50,8 +50,8 @@ func main() {
 		authorized.POST("/", usahaRest.CreateUsaha)
 		authorized.GET("/", usahaRest.GetAllUsahaByUser)
 
-		authorized.POST("/:usahaId/invite", userRest.Invite)
 		authorized.POST("/:usahaId/akun", akunRest.CreateNewAkun)
+		authorized.GET("/:usahaId/akun", akunRest.GetAllAkun)
 
 	}
 
