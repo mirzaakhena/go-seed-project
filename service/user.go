@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/jinzhu/gorm"
 	"github.com/satori/go.uuid"
+	"golang.org/x/crypto/bcrypt"
 	_ "strconv"
 )
 
@@ -13,7 +14,7 @@ type UserService struct {
 }
 
 type RegisterParam struct {
-	Nama     string `json:"nama" binding:"required"`
+	Name     string `json:"nama" binding:"required"`
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 	Phone    string `json:"phone"`
@@ -25,7 +26,7 @@ type LoginParam struct {
 	Password string `json:"password" binding:"required"`
 }
 
-func (serv UserService) Register(param RegisterParam) error {
+func (serv UserService) Register(param RegisterParam) (*model.User, error) {
 
 	var count int
 
@@ -36,31 +37,44 @@ func (serv UserService) Register(param RegisterParam) error {
 	if count > 0 {
 		s := "User dengan email " + param.Email + " sudah terdaftar"
 		log.Errorf(s)
-		return errors.New(s)
+		return nil, errors.New(s)
 	}
 
-	tx.Create(&model.User{
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(param.Password), 10)
+
+	user := &model.User{
 		ID:       uuid.NewV4().String(),
-		Nama:     param.Nama,
+		Name:     param.Name,
 		Email:    param.Email,
-		Password: param.Password,
+		Password: string(hashedPassword),
 		Phone:    param.Phone,
 		Address:  param.Address,
-	})
+	}
+
+	tx.Create(user)
 
 	tx.Commit()
 
-	log.Infof("user %s berhasil didaftarkan", param.Nama)
+	log.Infof("user %s berhasil didaftarkan", param.Name)
 
-	return nil
+	return user, nil
 }
 
 func (serv UserService) Login(param LoginParam) (string, error) {
 
 	var user model.User
-	serv.DB.Where("email = ? AND password = ?", param.Email, param.Password).First(&user)
+	serv.DB.Where("email = ?", param.Email).First(&user)
+
 	if user.ID == "" {
 		s := "email atau password tidak cocok"
+		log.Errorf(s)
+		return "", errors.New(s)
+	}
+
+	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(param.Password))
+
+	if err != nil {
+		s := "email atau password tidak cocok."
 		log.Errorf(s)
 		return "", errors.New(s)
 	}

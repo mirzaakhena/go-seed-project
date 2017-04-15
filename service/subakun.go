@@ -9,8 +9,7 @@ import (
 )
 
 type SubAkunService struct {
-	DB          *gorm.DB
-	AkunService *AkunService
+	DB *gorm.DB
 }
 
 type CreateSubAkunWithParentCodeParam struct {

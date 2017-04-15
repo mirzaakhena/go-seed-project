@@ -17,13 +17,13 @@ func (ctrl UserRest) Register(c *gin.Context) {
 		return
 	}
 
-	err := ctrl.UserService.Register(param)
+	user, err := ctrl.UserService.Register(param)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, map[string]string{"message": "user berhasil didaftarkan"})
+	c.JSON(http.StatusCreated, user)
 
 }
 

@@ -10,9 +10,14 @@ import (
 )
 
 func main() {
+	router, _ := MainEngine("barang.db")
+	router.Run()
+}
+
+func MainEngine(databaseName string) (*gin.Engine, *gorm.DB) {
 
 	// open db connection
-	db, err := gorm.Open("sqlite3", "barang.db")
+	db, err := gorm.Open("sqlite3", databaseName)
 	if err != nil {
 		panic("gak bisa konek ke database")
 	}
@@ -24,16 +29,20 @@ func main() {
 	db.AutoMigrate(&model.Akun{})
 	db.AutoMigrate(&model.Usaha{})
 	db.AutoMigrate(&model.UserUsaha{})
+	db.AutoMigrate(&model.SubAkun{})
 
 	// wiring "bean"
 	userService := service.UserService{DB: db}
 	userRest := rest.UserRest{UserService: &userService}
 
+	usahaService := service.UsahaService{DB: db}
+	usahaRest := rest.UsahaRest{UsahaService: &usahaService}
+
 	akunService := service.AkunService{DB: db}
 	akunRest := rest.AkunRest{AkunService: &akunService}
 
-	usahaService := service.UsahaService{DB: db}
-	usahaRest := rest.UsahaRest{UsahaService: &usahaService}
+	subakunService := service.SubAkunService{DB: db}
+	subakunRest := rest.SubAkunRest{SubAkunService: &subakunService}
 
 	// prepare endpoint api
 	router := gin.Default()
@@ -50,12 +59,12 @@ func main() {
 		authorized.POST("/", usahaRest.CreateUsaha)
 		authorized.GET("/", usahaRest.GetAllUsahaByUser)
 
-		authorized.POST("/:usahaId/akun", akunRest.CreateNewAkun)
+		authorized.POST("/:usahaId/akun", akunRest.CreateAkun)
 		authorized.GET("/:usahaId/akun", akunRest.GetAllAkun)
 
+		authorized.POST("/:usahaId/akun/:akunId", subakunRest.CreateSubAkun)
+		authorized.GET("/:usahaId/akun/:akunId", subakunRest.GetAllSubAkun)
 	}
 
-	// start server
-	router.Run()
-
+	return router, db
 }

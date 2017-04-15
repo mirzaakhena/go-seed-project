@@ -19,7 +19,7 @@ type CreateAkunParam struct {
 	ChildType  string `json:"child_type" binding:"required"`
 }
 
-func (serv AkunService) CreateNewAkun(usahaId string, param CreateAkunParam) error {
+func (serv AkunService) CreateAkun(usahaId string, param CreateAkunParam) error {
 
 	// TODO apakah user terdaftar pada usaha ini?
 	// TODO apakah user diijinkan utk membuat akun?
@@ -50,6 +50,7 @@ func (serv AkunService) CreateNewAkun(usahaId string, param CreateAkunParam) err
 			ParentId:    "",
 			CurrentCode: 0,
 			ChildCount:  0,
+			Deleted:     false,
 		})
 
 		log.Infof("akun parent %s berhasil dibuat", param.Name)
@@ -76,9 +77,10 @@ func (serv AkunService) CreateNewAkun(usahaId string, param CreateAkunParam) err
 				Code:        param.ParentCode + "." + strconv.Itoa(nextChildIndex),
 				Side:        parentAkun.Side,
 				Level:       parentAkun.Level + 1,
-				ParentId:    parentAkun.ParentId,
+				ParentId:    parentAkun.ID,
 				CurrentCode: 0,
 				ChildCount:  0,
+				Deleted:     false,
 			}).Error
 
 			if err != nil {
