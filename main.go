@@ -56,8 +56,8 @@ func MainEngine(databaseName string) (*gin.Engine, *gorm.DB) {
 	authorized.Use(rest.Authenticate)
 	{
 
-		authorized.POST("/", usahaRest.CreateUsaha)
-		authorized.GET("/", usahaRest.GetAllUsahaByUser)
+		authorized.POST("", usahaRest.CreateUsaha)
+		authorized.GET("", usahaRest.GetAllUsahaByUser)
 
 		authorized.POST("/:usahaId/akun", akunRest.CreateAkun)
 		authorized.GET("/:usahaId/akun", akunRest.GetAllAkun)

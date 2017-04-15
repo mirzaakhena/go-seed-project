@@ -17,14 +17,16 @@ type CreateUsahaParam struct {
 	Description string `json:"description"`
 }
 
-func (serv UsahaService) CreateUsaha(userId string, param CreateUsahaParam) error {
+func (serv UsahaService) CreateUsaha(userId string, param CreateUsahaParam) (*model.Usaha, error) {
 
 	usahaId := uuid.NewV4().String()
-	serv.DB.Create(&model.Usaha{
+	usaha := &model.Usaha{
 		ID:          usahaId,
 		Name:        param.Name,
 		Description: param.Description,
-	})
+	}
+
+	serv.DB.Create(usaha)
 
 	serv.DB.Create(&model.UserUsaha{
 		ID:      uuid.NewV4().String(),
@@ -32,7 +34,9 @@ func (serv UsahaService) CreateUsaha(userId string, param CreateUsahaParam) erro
 		UserId:  userId,
 	})
 
-	return nil
+	// TODO tambahkan hak akses!!
+
+	return usaha, nil
 }
 
 func (serv UsahaService) GetAllUsahaByUser(userId string) []model.Usaha {

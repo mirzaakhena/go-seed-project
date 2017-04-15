@@ -44,7 +44,7 @@ func (serv SubAkunService) CreateSubAkunWithParentCode(usahaId string, param Cre
 
 }
 
-func (serv SubAkunService) CreateSubAkun(usahaId string, akunId string, param CreateSubAkunParam) error {
+func (serv SubAkunService) CreateSubAkun(usahaId string, akunId string, param CreateSubAkunParam) (*model.SubAkun, error) {
 
 	// TODO apakah boleh membuat subakun
 	var akun model.Akun
@@ -53,17 +53,19 @@ func (serv SubAkunService) CreateSubAkun(usahaId string, akunId string, param Cr
 	if akun.ID == "" {
 		m := "akun with id " + akunId + " not Found"
 		log.Error(m)
-		return errors.New(m)
+		return nil, errors.New(m)
 	}
 
-	serv.DB.Create(&model.SubAkun{
+	subAkun := &model.SubAkun{
 		ID:       uuid.NewV4().String(),
 		UsahaId:  usahaId,
 		Name:     param.Name,
 		ParentId: akun.ID,
-	})
+	}
 
-	return nil
+	serv.DB.Create(subAkun)
+
+	return subAkun, nil
 
 }
 

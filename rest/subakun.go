@@ -20,13 +20,13 @@ func (ctrl SubAkunRest) CreateSubAkun(c *gin.Context) {
 	usahaId := c.Param("usahaId")
 	akunId := c.Param("akunId")
 
-	err := ctrl.SubAkunService.CreateSubAkun(usahaId, akunId, param)
+	subAkun, err := ctrl.SubAkunService.CreateSubAkun(usahaId, akunId, param)
 	if err != nil {
 		c.JSON(http.StatusCreated, map[string]string{"message": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, map[string]string{"message": "subakun berhasil dibuat"})
+	c.JSON(http.StatusCreated, subAkun)
 
 }
 

@@ -19,13 +19,13 @@ func (ctrl AkunRest) CreateAkun(c *gin.Context) {
 
 	usahaId := c.Param("usahaId")
 
-	err := ctrl.AkunService.CreateAkun(usahaId, param)
+	akun, err := ctrl.AkunService.CreateAkun(usahaId, param)
 	if err != nil {
 		c.JSON(http.StatusCreated, map[string]string{"message": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, map[string]string{"message": "akun berhasil dibuat"})
+	c.JSON(http.StatusCreated, akun)
 
 }
 

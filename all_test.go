@@ -23,6 +23,8 @@ func TestRegister(t *testing.T) {
 
 	r, _ := MainEngine(filename)
 
+	//================= REGISTER
+
 	{
 		postBody := service.RegisterParam{
 			Name:     "akhena",
@@ -50,9 +52,11 @@ func TestRegister(t *testing.T) {
 
 		req.Body.Close()
 	}
-	//=================
+
+	//================= LOGIN
 
 	var token string
+
 	{
 		postBody := service.LoginParam{
 			Email:    "aaa@gmail.com",
@@ -69,6 +73,103 @@ func TestRegister(t *testing.T) {
 
 		token = resp.Header().Get("token")
 		assert.NotEmpty(t, token)
+
+		req.Body.Close()
+	}
+
+	//================= CREATE USAHA
+
+	var usahaId string
+
+	{
+		postBody := service.CreateUsahaParam{
+			Name:        "Laura",
+			Description: "laundry kita",
+		}
+
+		body, _ := json.Marshal(postBody)
+
+		req, _ := http.NewRequest("POST", "/usaha", bytes.NewReader(body))
+
+		req.Header.Add("Authorization", "Bearer "+token)
+
+		resp := httptest.NewRecorder()
+
+		r.ServeHTTP(resp, req)
+
+		usaha := &model.Usaha{}
+
+		json.Unmarshal(resp.Body.Bytes(), usaha)
+
+		log.Debug(resp.Body.String())
+
+		assert.Equal(t, "Laura", usaha.Name)
+		assert.Equal(t, "laundry kita", usaha.Description)
+
+		usahaId = usaha.ID
+
+		req.Body.Close()
+	}
+
+	//================= CREATE AKUN
+
+	var akunId string
+
+	{
+		postBody := service.CreateAkunParam{
+			Name:       "Kas",
+			Side:       "ACTIVA",
+			ParentCode: "",
+			ChildType:  "SUB_AKUN",
+		}
+
+		body, _ := json.Marshal(postBody)
+
+		req, _ := http.NewRequest("POST", "/usaha/"+usahaId+"/akun", bytes.NewReader(body))
+
+		req.Header.Add("Authorization", "Bearer "+token)
+
+		resp := httptest.NewRecorder()
+
+		r.ServeHTTP(resp, req)
+
+		akun := &model.Akun{}
+
+		json.Unmarshal(resp.Body.Bytes(), akun)
+
+		log.Debug(resp.Body.String())
+
+		assert.Equal(t, "Kas", akun.Name)
+
+		akunId = akun.ID
+
+		req.Body.Close()
+	}
+
+	//================= CREATE SUB_AKUN
+
+	{
+		postBody := service.CreateSubAkunParam{
+			Name: "Kas Besar",
+		}
+
+		body, _ := json.Marshal(postBody)
+
+		req, _ := http.NewRequest("POST", "/usaha/"+usahaId+"/akun/"+akunId, bytes.NewReader(body))
+
+		req.Header.Add("Authorization", "Bearer "+token)
+
+		resp := httptest.NewRecorder()
+
+		r.ServeHTTP(resp, req)
+
+		akun := &model.SubAkun{}
+
+		json.Unmarshal(resp.Body.Bytes(), akun)
+
+		log.Debug(resp.Body.String())
+
+		assert.Equal(t, "Kas Besar", akun.Name)
 
 		req.Body.Close()
 	}

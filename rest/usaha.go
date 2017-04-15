@@ -11,15 +11,22 @@ type UsahaRest struct {
 }
 
 func (rest UsahaRest) CreateUsaha(c *gin.Context) {
+
 	var param service.CreateUsahaParam
 	if err := c.BindJSON(&param); err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"message": "invalid params"})
 		return
 	}
+
 	v, _ := c.Get("jwt")
+
 	jwt, _ := v.(*service.CustomJwt)
-	rest.UsahaService.CreateUsaha(jwt.UserId, param)
-	c.JSON(http.StatusOK, map[string]string{"message": "Usaha telah dibuat"})
+
+	log.Debugf("user %s creating usaha", jwt.UserId)
+
+	usaha, _ := rest.UsahaService.CreateUsaha(jwt.UserId, param)
+
+	c.JSON(http.StatusCreated, usaha)
 }
 
 func (rest UsahaRest) GetAllUsahaByUser(c *gin.Context) {
