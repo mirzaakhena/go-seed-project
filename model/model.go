@@ -1,5 +1,9 @@
 package model
 
+import (
+	"time"
+)
+
 type User struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
@@ -48,6 +52,11 @@ const (
 	WORK_IN_PROCESS string = "WORK_IN_PROCESS"
 )
 
+const (
+	DEBET  string = "DEBET"
+	CREDIT string = "CREDIT"
+)
+
 type Akun struct {
 	ID          string `json:"id"`
 	UsahaId     string `json:"-"`
@@ -63,10 +72,35 @@ type Akun struct {
 	Deleted     bool   `json:"-"`
 }
 
+type AkunBalance struct {
+	ID            string    `json:"id"`
+	UsahaId       string    `json:"-"`
+	Date          time.Time `json:"date"`
+	Amount        float64   `json:"amount"`
+	Balance       float64   `json:"balance"`
+	AkunId        string    `json:"akun_id"`
+	AkunDirection string    `json:"akun_direction"`
+}
+
 type SubAkun struct {
 	ID       string `json:"id"`
 	UsahaId  string `json:"-"`
 	Name     string `json:"name"`
 	ParentId string `json:"parent_id"`
 	Parent   *Akun  `json:"-"`
+}
+
+type Jurnal struct {
+	ID          string    `json:"id"`
+	UsahaId     string    `json:"-"`
+	Date        time.Time `json:"date"`
+	UserId      string    `json:"user_id"`
+	Description string    `json:"description"`
+}
+
+type JurnalAkunBalance struct {
+	ID            string `json:"id"`
+	UsahaId       string `json:"-"`
+	JurnalId      string `json:"jurnal_id"`
+	AkunBalanceId string `json:"akun_balance_id"`
 }

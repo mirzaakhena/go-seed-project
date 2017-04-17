@@ -174,4 +174,43 @@ func TestRegister(t *testing.T) {
 		req.Body.Close()
 	}
 
+	//================= CREATE JURNAL
+
+	{
+		postBody := service.CreateJurnalParam{
+			"bikin jurnal",
+			[]interface{}{
+				service.AkunInputOutput{
+					service.BaseAkun{""},
+					"",
+					20000,
+				},
+				service.AkunInputOutput{
+					service.BaseAkun{""},
+					"",
+					20000,
+				},
+			},
+		}
+
+		body, _ := json.Marshal(postBody)
+
+		req, _ := http.NewRequest("POST", "/usaha/"+usahaId+"/jurnal", bytes.NewReader(body))
+
+		req.Header.Add("Authorization", "Bearer "+token)
+
+		resp := httptest.NewRecorder()
+
+		r.ServeHTTP(resp, req)
+
+		akun := &model.Jurnal{}
+
+		json.Unmarshal(resp.Body.Bytes(), akun)
+
+		log.Debug(resp.Body.String())
+
+		assert.Equal(t, "Kas Besar", akun.Description)
+
+		req.Body.Close()
+	}
 }

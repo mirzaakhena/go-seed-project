@@ -30,6 +30,7 @@ func MainEngine(databaseName string) (*gin.Engine, *gorm.DB) {
 	db.AutoMigrate(&model.Usaha{})
 	db.AutoMigrate(&model.UserUsaha{})
 	db.AutoMigrate(&model.SubAkun{})
+	db.AutoMigrate(&model.Jurnal{})
 
 	// wiring "bean"
 	userService := service.UserService{DB: db}
@@ -43,6 +44,9 @@ func MainEngine(databaseName string) (*gin.Engine, *gorm.DB) {
 
 	subakunService := service.SubAkunService{DB: db}
 	subakunRest := rest.SubAkunRest{SubAkunService: &subakunService}
+
+	jurnalService := service.JurnalService{DB: db}
+	jurnalRest := rest.JurnalRest{JurnalService: &jurnalService}
 
 	// prepare endpoint api
 	router := gin.Default()
@@ -64,6 +68,8 @@ func MainEngine(databaseName string) (*gin.Engine, *gorm.DB) {
 
 		authorized.POST("/:usahaId/akun/:akunId", subakunRest.CreateSubAkun)
 		authorized.GET("/:usahaId/akun/:akunId", subakunRest.GetAllSubAkun)
+
+		authorized.POST("/:usahaId/jurnal", jurnalRest.CreateJurnal)
 	}
 
 	return router, db
