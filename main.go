@@ -45,7 +45,11 @@ func MainEngine(databaseName string) (*gin.Engine, *gorm.DB) {
 	subakunService := service.SubAkunService{DB: db}
 	subakunRest := rest.SubAkunRest{SubAkunService: &subakunService}
 
-	jurnalService := service.JurnalService{DB: db}
+	jurnalService := service.JurnalService{
+		DB:             db,
+		AkunService:    &akunService,
+		SubAkunService: &subakunService,
+	}
 	jurnalRest := rest.JurnalRest{JurnalService: &jurnalService}
 
 	// prepare endpoint api
@@ -63,8 +67,8 @@ func MainEngine(databaseName string) (*gin.Engine, *gorm.DB) {
 		authorized.POST("", usahaRest.CreateUsaha)
 		authorized.GET("", usahaRest.GetAllUsahaByUser)
 
-		authorized.POST("/:usahaId/akun", akunRest.CreateAkun)
-		authorized.GET("/:usahaId/akun", akunRest.GetAllAkun)
+		authorized.POST("/:usahaId/akun", akunRest.Create)
+		authorized.GET("/:usahaId/akun", akunRest.GetAll)
 
 		authorized.POST("/:usahaId/akun/:akunId", subakunRest.CreateSubAkun)
 		authorized.GET("/:usahaId/akun/:akunId", subakunRest.GetAllSubAkun)

@@ -90,6 +90,16 @@ type SubAkun struct {
 	Parent   *Akun  `json:"-"`
 }
 
+type SubAkunBalance struct {
+	ID            string  `json:"id"`
+	UsahaId       string  `json:"-"`
+	JurnalId      string  `json:"jurnal_id"`
+	SubAkunId     string  `json:"subakun_id"`
+	Amount        float64 `json:"amount"`
+	Balance       float64 `json:"balance"`
+	AkunDirection string  `json:"akun_direction"`
+}
+
 type Jurnal struct {
 	ID          string    `json:"id"`
 	UsahaId     string    `json:"-"`

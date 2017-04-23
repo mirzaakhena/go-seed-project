@@ -75,9 +75,9 @@ func (serv SubAkunService) GetAllSubAkun(usahaId string, akunId string) []model.
 	return listOfSubAkun
 }
 
-func (serv SubAkunService) GetSubAkunById(usahaId string, subAkunId string) *model.SubAkun {
+func (serv SubAkunService) GetById(usahaId string, subAkunId string) *model.SubAkun {
 	var subAkun model.SubAkun
-	serv.DB.Where("usaha_id = ? AND id = ?", usahaId, subAkunId).Find(&subAkun)
+	serv.DB.Preload("Parent").Where("usaha_id = ? AND id = ?", usahaId, subAkunId).First(&subAkun)
 	return &subAkun
 }
 

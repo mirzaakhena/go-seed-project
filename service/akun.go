@@ -19,7 +19,7 @@ type CreateAkunParam struct {
 	ChildType  string `json:"child_type" binding:"required"`
 }
 
-func (serv AkunService) CreateAkun(usahaId string, param CreateAkunParam) (*model.Akun, error) {
+func (serv AkunService) Create(usahaId string, param CreateAkunParam) (*model.Akun, error) {
 
 	// TODO apakah user terdaftar pada usaha ini?
 	// TODO apakah user diijinkan utk membuat akun?
@@ -115,8 +115,14 @@ func (serv AkunService) CreateAkun(usahaId string, param CreateAkunParam) (*mode
 
 }
 
-func (serv AkunService) GetAllAkun(usahaId string) []model.Akun {
+func (serv AkunService) GetAll(usahaId string) []model.Akun {
 	var listOfAkun []model.Akun
 	serv.DB.Where("usaha_id = ? AND deleted = 0", usahaId).Find(&listOfAkun)
 	return listOfAkun
+}
+
+func (serv AkunService) GetById(usahaId string, akunId string) model.Akun {
+	var akun model.Akun
+	serv.DB.Where("usaha_id = ? AND id = ? AND deleted = 0", usahaId, akunId).First(&akun)
+	return akun
 }

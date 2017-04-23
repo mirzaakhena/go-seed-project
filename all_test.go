@@ -181,14 +181,14 @@ func TestRegister(t *testing.T) {
 			"bikin jurnal",
 			[]interface{}{
 				service.AkunInputOutput{
-					service.BaseAkun{""},
-					"",
+					service.BaseAkun{"aaaa"},
+					"123",
 					20000,
 				},
 				service.AkunInputOutput{
-					service.BaseAkun{""},
-					"",
-					20000,
+					service.BaseAkun{"xxxx"},
+					"456",
+					35000,
 				},
 			},
 		}

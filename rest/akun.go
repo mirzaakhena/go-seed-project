@@ -10,7 +10,7 @@ type AkunRest struct {
 	AkunService *service.AkunService
 }
 
-func (ctrl AkunRest) CreateAkun(c *gin.Context) {
+func (ctrl AkunRest) Create(c *gin.Context) {
 	var param service.CreateAkunParam
 	if err := c.BindJSON(&param); err != nil {
 		c.JSON(http.StatusBadRequest, map[string]string{"message": "invalid params"})
@@ -19,7 +19,7 @@ func (ctrl AkunRest) CreateAkun(c *gin.Context) {
 
 	usahaId := c.Param("usahaId")
 
-	akun, err := ctrl.AkunService.CreateAkun(usahaId, param)
+	akun, err := ctrl.AkunService.Create(usahaId, param)
 	if err != nil {
 		c.JSON(http.StatusCreated, map[string]string{"message": err.Error()})
 		return
@@ -29,9 +29,9 @@ func (ctrl AkunRest) CreateAkun(c *gin.Context) {
 
 }
 
-func (ctrl AkunRest) GetAllAkun(c *gin.Context) {
+func (ctrl AkunRest) GetAll(c *gin.Context) {
 
 	usahaId := c.Param("usahaId")
 
-	c.JSON(http.StatusOK, ctrl.AkunService.GetAllAkun(usahaId))
+	c.JSON(http.StatusOK, ctrl.AkunService.GetAll(usahaId))
 }
