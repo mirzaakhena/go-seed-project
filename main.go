@@ -22,7 +22,7 @@ func MainEngine(databaseName string) (*gin.Engine, *gorm.DB) {
 		panic("gak bisa konek ke database")
 	}
 
-	db.LogMode(true)
+	// db.LogMode(true)
 
 	// // build table according to schema
 	db.AutoMigrate(&model.User{})

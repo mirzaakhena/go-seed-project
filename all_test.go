@@ -111,16 +111,79 @@ func TestRegister(t *testing.T) {
 		req.Body.Close()
 	}
 
-	//================= CREATE AKUN
+	//================= CREATE MULTIPLE AKUN
 
 	var akunId string
 
 	{
-		postBody := service.CreateAkunParam{
-			Name:       "Kas",
-			Side:       "ACTIVA",
-			ParentCode: "",
-			ChildType:  "SUB_AKUN",
+		// postBody := service.CreateAkunParam{
+		// 	Name:       "Kas",
+		// 	Side:       "ACTIVA",
+		// 	ParentCode: "",
+		// 	ChildType:  "SUB_AKUN",
+		// }
+
+		postBody := []service.CreateAkunParam{
+			service.CreateAkunParam{
+				Name:       "Harta",
+				Side:       "ACTIVA",
+				ParentCode: "",
+				ChildType:  "AKUN",
+			},
+			service.CreateAkunParam{
+				Name:       "Harta Lancar",
+				Side:       "ACTIVA",
+				ParentCode: "1",
+				ChildType:  "AKUN",
+			},
+			service.CreateAkunParam{
+				Name:       "Kas",
+				Side:       "ACTIVA",
+				ParentCode: "1.1",
+				ChildType:  "SUB_AKUN",
+			},
+			service.CreateAkunParam{
+				Name:       "Bank",
+				Side:       "ACTIVA",
+				ParentCode: "1.1",
+				ChildType:  "SUB_AKUN",
+			},
+			service.CreateAkunParam{
+				Name:       "Piutang",
+				Side:       "ACTIVA",
+				ParentCode: "1.1",
+				ChildType:  "SUB_AKUN",
+			},
+			service.CreateAkunParam{
+				Name:       "Utang",
+				Side:       "PASSIVA",
+				ParentCode: "",
+				ChildType:  "SUB_AKUN",
+			},
+			service.CreateAkunParam{
+				Name:       "Modal",
+				Side:       "PASSIVA",
+				ParentCode: "",
+				ChildType:  "AKUN",
+			},
+			service.CreateAkunParam{
+				Name:       "Modal Mirza",
+				Side:       "PASSIVA",
+				ParentCode: "3",
+				ChildType:  "AKUN",
+			},
+			service.CreateAkunParam{
+				Name:       "Pendapatan",
+				Side:       "PASSIVA",
+				ParentCode: "",
+				ChildType:  "AKUN",
+			},
+			service.CreateAkunParam{
+				Name:       "Biaya",
+				Side:       "ACTIVA",
+				ParentCode: "",
+				ChildType:  "SUB_AKUN",
+			},
 		}
 
 		body, _ := json.Marshal(postBody)
@@ -140,6 +203,41 @@ func TestRegister(t *testing.T) {
 		log.Debug(resp.Body.String())
 
 		assert.Equal(t, "Kas", akun.Name)
+
+		akunId = akun.ID
+
+		req.Body.Close()
+	}
+
+	//================= CREATE SINGLE AKUN
+
+	// var akunId string
+
+	{
+		postBody := service.CreateAkunParam{
+			Name:       "Barang Dagangan",
+			Side:       "ACTIVA",
+			ParentCode: "1.1",
+			ChildType:  "SUB_AKUN",
+		}
+
+		body, _ := json.Marshal(postBody)
+
+		req, _ := http.NewRequest("POST", "/usaha/"+usahaId+"/akun", bytes.NewReader(body))
+
+		req.Header.Add("Authorization", "Bearer "+token)
+
+		resp := httptest.NewRecorder()
+
+		r.ServeHTTP(resp, req)
+
+		akun := &model.Akun{}
+
+		json.Unmarshal(resp.Body.Bytes(), akun)
+
+		log.Debug(resp.Body.String())
+
+		assert.Equal(t, "Barang Dagangan", akun.Name)
 
 		akunId = akun.ID
 
@@ -180,12 +278,12 @@ func TestRegister(t *testing.T) {
 		postBody := service.CreateJurnalParam{
 			"bikin jurnal",
 			[]interface{}{
-				service.AkunInputOutput{
+				service.AkunIO{
 					service.BaseAkun{"aaaa"},
 					"123",
 					20000,
 				},
-				service.AkunInputOutput{
+				service.AkunIO{
 					service.BaseAkun{"xxxx"},
 					"456",
 					35000,

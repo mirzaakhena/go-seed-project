@@ -98,11 +98,24 @@ func (serv JurnalService) getAmountOfAkun(jurnal *model.Jurnal, baseAkun interfa
 
 		} else if x.Type == "subakun-input" {
 			subakun := serv.SubAkunService.GetById(jurnal.UsahaId, x.ID)
+
+			// get the last balance
+			var subAkunBal model.SubAkunBalance
+			serv.DB.Preload("Jurnal").Where("usaha_id = ? AND sub_akun_id = ? AND jurnal.date <= ?", jurnal.UsahaId, x.ID, jurnal.Date).Order("jurnal.date DESC").First(&subAkunBal)
+			lastBal := subAkunBal.Balance
+
 			akunBalance := &model.AkunBalance{
-				ID:      uuid.NewV4().String(),
-				UsahaId: jurnal.UsahaId,
+				ID:            uuid.NewV4().String(),
+				UsahaId:       jurnal.UsahaId,
+				AkunDirection: serv.getDirection(subakun.Parent.Side, x.Amount),
+				AkunId:        subakun.ParentId,
+				Date:          jurnal.Date,
+				Amount:        x.Amount,
+				Balance:       lastBal + x.Amount,
 			}
-			log.Debug(akunBalance)
+
+			serv.DB.Create(akunBalance)
+
 			{
 				code = subakun.Parent.Code
 				direction = serv.getDirection(subakun.Parent.Side, x.Amount)
@@ -112,6 +125,24 @@ func (serv JurnalService) getAmountOfAkun(jurnal *model.Jurnal, baseAkun interfa
 
 		} else if x.Type == "subakun-output" {
 			subakun := serv.SubAkunService.GetById(jurnal.UsahaId, x.ID)
+
+			// get the last balance
+			var subAkunBal model.SubAkunBalance
+			serv.DB.Preload("Jurnal").Where("usaha_id = ? AND sub_akun_id = ? AND jurnal.date <= ?", jurnal.UsahaId, x.ID, jurnal.Date).Order("jurnal.date DESC").First(&subAkunBal)
+			lastBal := subAkunBal.Balance
+
+			akunBalance := &model.AkunBalance{
+				ID:            uuid.NewV4().String(),
+				UsahaId:       jurnal.UsahaId,
+				AkunDirection: serv.getDirection(subakun.Parent.Side, x.Amount),
+				AkunId:        subakun.ParentId,
+				Date:          jurnal.Date,
+				Amount:        x.Amount,
+				Balance:       lastBal + -x.Amount,
+			}
+
+			serv.DB.Create(akunBalance)
+
 			{
 				code = subakun.Parent.Code
 				direction = serv.getDirection(subakun.Parent.Side, -x.Amount)
@@ -132,6 +163,11 @@ func (serv JurnalService) getAmountOfAkun(jurnal *model.Jurnal, baseAkun interfa
 }
 
 func (serv JurnalService) getDirection(side string, amount float64) string {
-
+	if (side == "ACTIVA" && amount > 0) || (side == "PASSIVA" && amount < 0) {
+		return "DEBET"
+	}
+	if (side == "PASSIVA" && amount > 0) || (side == "ACTIVA" && amount < 0) {
+		return "CREDIT"
+	}
 	return ""
 }

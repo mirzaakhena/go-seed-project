@@ -41,20 +41,24 @@ type UserHakAkses struct {
 
 // =======================
 
+// SIDES
 const (
 	ACTIVA  string = "ACTIVA"
 	PASSIVA string = "PASSIVA"
 )
 
+// SUB_AKUN TYPES
 const (
 	SUB_AKUN        string = "SUB_AKUN"
 	INVENTORY       string = "INVENTORY"
 	WORK_IN_PROCESS string = "WORK_IN_PROCESS"
 )
 
+// DIRECTIONS
 const (
 	DEBET  string = "DEBET"
 	CREDIT string = "CREDIT"
+	NONE   string = "NONE"
 )
 
 type Akun struct {
@@ -94,6 +98,7 @@ type SubAkunBalance struct {
 	ID            string  `json:"id"`
 	UsahaId       string  `json:"-"`
 	JurnalId      string  `json:"jurnal_id"`
+	Jurnal        string  `json:"jurnal"`
 	SubAkunId     string  `json:"subakun_id"`
 	Amount        float64 `json:"amount"`
 	Balance       float64 `json:"balance"`

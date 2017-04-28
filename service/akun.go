@@ -19,99 +19,107 @@ type CreateAkunParam struct {
 	ChildType  string `json:"child_type" binding:"required"`
 }
 
-func (serv AkunService) Create(usahaId string, param CreateAkunParam) (*model.Akun, error) {
+func (serv AkunService) Create(usahaId string, params []CreateAkunParam) ([]model.Akun, error) {
 
 	// TODO apakah user terdaftar pada usaha ini?
 	// TODO apakah user diijinkan utk membuat akun?
 
-	if param.ParentCode == "" {
-		var count int
-
-		if param.Side != "ACTIVA" && param.Side != "PASSIVA" {
-			s := "sisi harus PASSIVA atau ACTIVA"
-			log.Errorf(s)
-			return nil, errors.New(s)
-		}
-
-		// TODO apakah dalam usaha dan level ini ada yang namanya sama?
-
-		serv.DB.Model(&model.Akun{}).Where("parent_id = ?", "").Count(&count)
-
-		log.Debugf("membuat akun parent dengan nama %s", param.Name)
-
-		akun := &model.Akun{
-			ID:          uuid.NewV4().String(),
-			Name:        param.Name,
-			UsahaId:     usahaId,
-			ChildType:   param.ChildType,
-			Code:        strconv.Itoa(count + 1),
-			Side:        param.Side,
-			Level:       1,
-			ParentId:    "",
-			CurrentCode: 0,
-			ChildCount:  0,
-			Deleted:     false,
-		}
-
-		serv.DB.Create(akun)
-
-		log.Infof("akun parent %s berhasil dibuat", param.Name)
-
-		return akun, nil
-
-	} else {
-		var parentAkun model.Akun
-
-		tx := serv.DB.Begin()
-
-		tx.Where("code = ?", param.ParentCode).First(&parentAkun)
-
-		// TODO apakah parent benar ada?
-		// TODO apakah dalam usaha dan parent_level + 1 ini ada nama yang sama?
-
-		nextChildIndex := parentAkun.CurrentCode + 1
-
-		log.Debugf("membuat akun anak dengan nama %s dibawah parent %s", param.Name, param.ParentCode)
-
-		user := &model.Akun{
-			ID:          uuid.NewV4().String(),
-			Name:        param.Name,
-			UsahaId:     usahaId,
-			ChildType:   param.ChildType,
-			Code:        param.ParentCode + "." + strconv.Itoa(nextChildIndex),
-			Side:        parentAkun.Side,
-			Level:       parentAkun.Level + 1,
-			ParentId:    parentAkun.ID,
-			CurrentCode: 0,
-			ChildCount:  0,
-			Deleted:     false,
-		}
-
-		err := tx.Create(user).Error
-
-		if err != nil {
-			tx.Rollback()
-			log.Errorf("error ketika buat akun anak. Rollback! ", err.Error())
-			return nil, err
-		}
-
-		log.Debugf("update count akun parent jadi ", parentAkun.ChildCount+1)
-
-		parentAkun.CurrentCode = parentAkun.CurrentCode + 1
-		parentAkun.ChildCount = parentAkun.ChildCount + 1
-		err = tx.Save(&parentAkun).Error
-		if err != nil {
-			tx.Rollback()
-			log.Errorf("error ketika update akun parent setelah buat akun anak. ", err.Error())
-			return nil, err
-		}
-
-		tx.Commit()
-
-		log.Infof("akun anak %s berhasil dibuat", param.Name)
-
-		return user, nil
+	if len(params) == 0 {
+		return nil, errors.New("empty arrays")
 	}
+
+	akuns := []model.Akun{}
+
+	tx := serv.DB.Begin()
+
+	for _, param := range params {
+
+		if param.ParentCode == "" {
+			var count int
+
+			if param.Side != "ACTIVA" && param.Side != "PASSIVA" {
+				tx.Rollback()
+				s := "sisi harus PASSIVA atau ACTIVA"
+				log.Errorf(s)
+				return nil, errors.New(s)
+			}
+
+			// TODO apakah dalam usaha dan level ini ada yang namanya sama?
+
+			tx.Model(&model.Akun{}).Where("usaha_id=? AND parent_id = ?", usahaId, "").Count(&count)
+
+			akun := &model.Akun{
+				ID:          uuid.NewV4().String(),
+				Name:        param.Name,
+				UsahaId:     usahaId,
+				ChildType:   param.ChildType,
+				Code:        strconv.Itoa(count + 1),
+				Side:        param.Side,
+				Level:       1,
+				ParentId:    "",
+				CurrentCode: 0,
+				ChildCount:  0,
+				Deleted:     false,
+			}
+
+			akuns = append(akuns, *akun)
+
+			tx.Create(akun)
+
+			log.Infof("akun parent %s berhasil dibuat", param.Name)
+
+		} else {
+
+			var parentAkun model.Akun
+
+			tx.Where("code = ? AND usaha_id = ?", param.ParentCode, usahaId).First(&parentAkun)
+
+			// TODO apakah parent benar ada?
+			// TODO apakah dalam usaha dan parent_level + 1 ini ada nama yang sama?
+
+			nextChildIndex := parentAkun.CurrentCode + 1
+
+			akun := &model.Akun{
+				ID:          uuid.NewV4().String(),
+				Name:        param.Name,
+				UsahaId:     usahaId,
+				ChildType:   param.ChildType,
+				Code:        param.ParentCode + "." + strconv.Itoa(nextChildIndex),
+				Side:        parentAkun.Side,
+				Level:       parentAkun.Level + 1,
+				ParentId:    parentAkun.ID,
+				CurrentCode: 0,
+				ChildCount:  0,
+				Deleted:     false,
+			}
+
+			akuns = append(akuns, *akun)
+
+			err := tx.Create(akun).Error
+
+			if err != nil {
+				tx.Rollback()
+				log.Errorf("error ketika buat akun anak. Rollback! %s", err.Error())
+				return nil, err
+			}
+
+			parentAkun.CurrentCode = parentAkun.CurrentCode + 1
+			parentAkun.ChildCount = parentAkun.ChildCount + 1
+			err = tx.Save(&parentAkun).Error
+			if err != nil {
+				tx.Rollback()
+				log.Errorf("error ketika update akun parent setelah buat akun anak. %s", err.Error())
+				return nil, err
+			}
+
+			log.Infof("akun anak %s berhasil dibuat", param.Name)
+
+		}
+	}
+
+	tx.Commit()
+
+	return akuns, nil
 
 }
 
